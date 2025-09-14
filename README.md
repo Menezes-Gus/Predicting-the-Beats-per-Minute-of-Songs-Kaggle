@@ -1,5 +1,3 @@
-# Predicting-the-Beats-per-Minute-of-Songs-Kaggle
-
 # Kaggle Competition: Predicting the Beats per Minute of Songs
 
 ## 🎯 Objective
@@ -17,6 +15,15 @@ The goal of this competition is to predict a song's beats-per-minute.
 1. Clone the repository:
    ```bash
    git clone https://github.com/Menezes-Gus/Predicting-the-Beats-per-Minute-of-Songs-Kaggle.git
+   ```
+2. If you don't already have the data zip file in data/raw folder, run download_data.py:
+    ```bash
+   python src/download_data.py
+   ```
+3. If you don't already extracted the zip file downloaded in the previous step, run extract_zip.py:
+    ```bash
+   python src/extract_zip.py
+   ```
 
 
 
