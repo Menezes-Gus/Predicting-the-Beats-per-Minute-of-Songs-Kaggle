@@ -5,7 +5,7 @@ The goal of this competition is to predict a song's beats-per-minute.
 
 ## 📂 Structure
 - `data/` → raw, processed and external data.
-- `notebooks/` → notebook flow: EDA → baseline → modeling → submission.
+- `notebooks/` → notebook flow: EDA → preprocessing → baseline → modeling → submission.
 - `src/` → reusable functions for preprocessing, modeling e metrics.
 - `results/` → charts, metrics and Kaggle submission.
 - `models/` → trained models binaries.
