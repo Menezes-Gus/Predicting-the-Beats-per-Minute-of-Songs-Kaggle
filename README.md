@@ -55,7 +55,7 @@ GitHub: https://github.com/Menezes-Gus
 |RhythmScore (float)|probably measures how consistent is the rhythmic pattern. Higher values indicate more consistency|
 |AudioLoudness (float)|in dB scale. The closer to 0 the higher the volume. Its in negative scale because its common to measure loudness relative to full scale|
 |VocalContent (float)|proportion of vocals in the song|
-|AcousticQuality (float)|indicates how acoustic (vs eletronic) the song is|
+|AcousticQuality (float)|indicates how acoustic (vs electronic) the song is|
 |InstrumentalScore (float)|same as VocalContent, but in regards to instruments besides vocals|
 |LivePerformanceLikelihood (float)|the likelihood of the audio to be a live performance|
 |MoodScore (float)|probably related to how "happy" or "sad" the song sounds. Higher values probably mean "happier" songs|
@@ -71,15 +71,16 @@ GitHub: https://github.com/Menezes-Gus
 ##### AudioLoudness is in a dB scale relative to full scale, hence, its negative values.
 ##### TrackDurationMs and AudioLoudness need standardization. 
 ### 6-Relevant Findings and Information
-#### EDA
+#### EDA insights
 ##### Most features don't correlate to each other, with the exception of a somewhat significant negative correlation between Energy and AcousticQuality (pearson, spearman and kendal).
 ##### Some outliers were found, but, due to the fact that the data is already (mostly) standardized, it looks like they're probably not actual outliers, or at least, they are outliers that hold relevant information.
-#### Baseline
+#### Feature Engineering and preprocessing 
 ##### I decided to create some flags to indicate when an entry appears to be an outlier, since it doesn't seem like a good idea to delete them.
 ##### For the baseline, a opted for a dummy regressor based on mean as a sanity check. Then, a Ridge Regression to test how a linear model would perform (and also to help with feature selection), a Random Forest Regressor, due to low correlation between features, and a LGBM Regressor, mostly out of curiosity.
-##### Created a Vocal/Instrumental ratio, based on the assumption that instrumental songs may be more constant and have lower BPM, while songs with vocals may have more changes in the structure to acomodate the singing, hence, possibly higher BPM.
+##### Created a Vocal/Instrumental ratio, based on the assumption that instrumental songs may be more constant and have lower BPM, while songs with vocals may have more changes in the structure to accommodate the singing, hence, possibly higher BPM.
 ##### Created an Energy and Rhythm interaction, based on the assumption that both energy and rhythmscore may be present in songs with higher BPM, so, when combined in a multiplication, their combined value should be high enough to distance itself apart from slower songs
 ##### Created MoodScore bins, based on the hypotesis that, because it measures something akin to an emotion, probably works better as a range. Also, due to the usage of Ridge Regression, dummy variables where created aswell.
+#### Baseline modelling and diagnostics
 ##### RANDOM_STATE=42
 ##### KFold with K=5 was also used during training, mostly to prevent overfitting and to use all of the available data
 |Model|RMSE|MAE|
@@ -88,7 +89,7 @@ GitHub: https://github.com/Menezes-Gus
 |ridge|26.466341374596727|21.19792095039579|
 |random forest|26.465788481708348|21.197653869516085|
 |lgbm|26.467350811600735|21.198498087056862|
-##### The models dont really look very promissing. They mostly performed the same as the dummy based on the mean. This sugests that the features dont show clear predictive power over the target.
+##### The models don’t really look very promissing. They mostly performed the same as the dummy based on the mean. This suggests that the features don’t show clear predictive power over the target.
 ##### Permutation importance also showed that the features hold little importance in predicting the target.
 ##### A lot of feature engineering will probably be needed.
 ##### Below is a table of segmented RMSE, calculated over 5 quantiles
@@ -100,5 +101,32 @@ GitHub: https://github.com/Menezes-Gus
 |Q4(60%-80%)|14.614545|14.616610|14.638233|14.633230|
 |Q5(80%-100%)|39.538506|39.537165|39.535175|39.533093|
 ##### This analysis show that all of the models do a good job predicting "average" songs BPM, but, struggle as the songs gets faster or slower. Features more sensible to these extremes are desirable.
-##### The First Submission (with the baseline) got me the 1481th place
+##### Below are the residuals ploted against the predicted BPM
+![alt text](image-1.png)
+##### The dummy model has this 5 vertical residual lines because of the kfold with k=5.
+![alt text](image-2.png)
+##### The Ridge model tried to predict essentially the average for almost all songs. And, as it is possible to see in the chart above, it didn't really captured significant information to discern between slower and faster songs. 
+![alt text](image-3.png)
+##### The Random forest model also tried to predict values close to the average for almost all songs. But, it is possible to notice a certain "bulge" to the right, indicating that the model managed to extract a bit more information over the features, when compared to the Ridge model.
+![alt text](image-4.png)
+##### The same can be said to lgbm.
+##### These residual plots confirm that all models collapse towards the mean (a strong bias). The usage of feature engineering or domain-specific variables is required to improve performance, specially at the extremes.
+##### The First Submission (with the baseline) got me 1481th place out of 2,035 participants and 1,986 teams. Considering this was a minimal solution, it sets a benchmark to improve upon in the next iterations.
 ![alt text](image.png)
+##### More feature engineering was done, this time using autofeat. The algorithm sugested the creation of new variables:
+1. VocalContent^3  / Energy
+2. Energy^3 / AcousticQuality
+3. MoodScore^3 * RhythmScore^2
+4. sqrt(LivePerformanceLikelihood) * TrackDurationMs^2
+##### The models were re-fited with those added interaction variables. The results didn't significantly changed.
+|Model|RMSE (original)|RMSE (with interaction variables)|MAE (original)|MAE (with interaction variables)|
+|-----|----|---|----|----|
+|dummy|26.468078417587844|26.468078417587844|21.19987341149104|21.19987341149104|
+|ridge|26.466341374596727|26.465385825000094|21.19792095039579|21.197030571261287|
+|random forest|26.465788481708348|26.465305023507657|21.197653869516085|21.196963534692447|
+|lgbm|26.467350811600735|26.467526741672962|21.198498087056862|21.198457247155215|
+##### Automatic feature generation (polynomials, ratios, logs, etc.) was tested with multiple strategies, but results did not show meaningful improvements. Further progress will likely require domain-specific engineered variables or rely on optimization of hyperparameters.
+
+
+### Next Steps:
+##### More feature engineering, modeling
