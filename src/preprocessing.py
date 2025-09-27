@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
+
 from typing import *
 
 
@@ -129,3 +130,16 @@ def one_hot_encoding(df: pd.DataFrame, col: str, encoder: OneHotEncoder = None) 
     df = df.drop(columns=[col])
     
     return df, encoder
+
+
+def create_labels_for_classification(y: pd.Series) -> pd.Series:
+    """
+    Function to define target variables for classification model
+    Said Classification model aim for identification of extremes in BPM
+    """
+    y_multiclass = pd.qcut(y, q=[0, 0.2, 0.8, 1.0], labels=[0, 1, 2])
+    return y_multiclass
+
+
+
+

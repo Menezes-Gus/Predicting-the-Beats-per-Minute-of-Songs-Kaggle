@@ -126,7 +126,8 @@ GitHub: https://github.com/Menezes-Gus
 |random forest|26.465788481708348|26.465305023507657|21.197653869516085|21.196963534692447|
 |lgbm|26.467350811600735|26.467526741672962|21.198498087056862|21.198457247155215|
 ##### Automatic feature generation (polynomials, ratios, logs, etc.) was tested with multiple strategies, but results did not show meaningful improvements. Further progress will likely require domain-specific engineered variables or rely on optimization of hyperparameters.
-
+##### I submitted the results of the best trained model (with engineered features), random forest. The submission's RMSE actually got worse.
+![alt text](image-5.png)
 
 ### Next Steps:
 ##### More feature engineering, modeling

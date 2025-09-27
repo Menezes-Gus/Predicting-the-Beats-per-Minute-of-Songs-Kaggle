@@ -2,7 +2,9 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler, PolynomialFeatures
 from autofeat import AutoFeatRegressor
-import featuretools as ft
+from sklearn.model_selection import KFold
+from lightgbm import LGBMClassifier
+#import featuretools as ft
 from typing import *
 
 
@@ -122,6 +124,30 @@ def create_live_track_interaction(df) -> pd.DataFrame:
     """
     df['live_track_interaction'] = np.sqrt(df['LivePerformanceLikelihood']) * df['TrackDurationMs']**2
     return df
+
+def create_classification_model(X: pd.DataFrame, y: pd.Series, kf: KFold,random_state: int = 42):
+    """
+    Function to run classification model. The objective is to classify if the song is slow, medium or fast (0, 1 and 2)
+    This classification (probability) will be used as a feature for the main regression
+    """
+    from lightgbm import LGBMClassifier
+    from sklearn.model_selection import cross_val_predict
+    clf = LGBMClassifier(n_estimators=500,random_state=random_state)
+    proba = cross_val_predict(clf, X, y, cv=kf, method="predict_proba", n_jobs=-1)
+    proba_df = pd.DataFrame(proba, columns=["proba_slow", "proba_medium", "proba_fast"], index=X.index)
+
+    return pd.concat([X, proba_df], axis=1), clf
+
+def create_classification_model(X: pd.DataFrame, clf: LGBMClassifier,  kf: KFold,random_state: int = 42):
+    """
+    Function to run classification model. The objective is to classify if the song is slow, medium or fast (0, 1 and 2)
+    This classification (probability) will be used as a feature for the main regression
+    """
+    
+    proba = clf.predict_proba(X)
+    proba_df = pd.DataFrame(proba, columns=["proba_slow", "proba_medium", "proba_fast"], index=X.index)
+
+    return pd.concat([X, proba_df], axis=1)
 
 def deep_feature_synthesis(df: pd.DataFrame):
     pass
