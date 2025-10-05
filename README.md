@@ -1,6 +1,6 @@
 # Kaggle Competition: Predicting the Beats per Minute of Songs
 
-## 🎯 Objective
+## Objective
 The goal of this competition is to predict a song's beats-per-minute.
 
 ## 📂 Structure
@@ -11,7 +11,7 @@ The goal of this competition is to predict a song's beats-per-minute.
 - `models/` → trained models binaries.
 - `requirements.txt` → dependencies.
 
-## 🚀 How to Run
+## How to Run
 1. Clone the repository:
    ```bash
    git clone https://github.com/Menezes-Gus/Predicting-the-Beats-per-Minute-of-Songs-Kaggle.git
@@ -92,27 +92,27 @@ GitHub: https://github.com/Menezes-Gus
 ##### The models don’t really look very promissing. They mostly performed the same as the dummy based on the mean. This suggests that the features don’t show clear predictive power over the target.
 ##### Permutation importance also showed that the features hold little importance in predicting the target.
 ##### A lot of feature engineering will probably be needed.
-##### Below is a table of segmented RMSE, calculated over 5 quantiles
-|Quantile|RMSE (dummy)|RMSE (ridge)|RMSE (random forest)|RMSE (lgbm)|
+##### Below is a table of segmented RMSE, calculated over 5 percentiles
+|Percentiles|RMSE (dummy)|RMSE (ridge)|RMSE (random forest)|RMSE (lgbm)|
 |--------|------------|------------|--------------------|-----------|
-|Q1(0%-20%)|38.537388|38.528707|38.501665|38.510559|
-|Q2(20%-40%)|15.007049|15.011208|15.031465|15.032779|
-|Q3(40%-60%)|3.951164|3.967620|4.073729|4.073727|
-|Q4(60%-80%)|14.614545|14.616610|14.638233|14.633230|
-|Q5(80%-100%)|39.538506|39.537165|39.535175|39.533093|
+|P1(0%-20%)|38.537388|38.528707|38.501665|38.510559|
+|P2(20%-40%)|15.007049|15.011208|15.031465|15.032779|
+|P3(40%-60%)|3.951164|3.967620|4.073729|4.073727|
+|P4(60%-80%)|14.614545|14.616610|14.638233|14.633230|
+|P5(80%-100%)|39.538506|39.537165|39.535175|39.533093|
 ##### This analysis show that all of the models do a good job predicting "average" songs BPM, but, struggle as the songs gets faster or slower. Features more sensible to these extremes are desirable.
 ##### Below are the residuals ploted against the predicted BPM
-![alt text](image-1.png)
+![alt text](data/images/image-1.png)
 ##### The dummy model has this 5 vertical residual lines because of the kfold with k=5.
-![alt text](image-2.png)
+![alt text](data/images/image-2.png)
 ##### The Ridge model tried to predict essentially the average for almost all songs. And, as it is possible to see in the chart above, it didn't really captured significant information to discern between slower and faster songs. 
-![alt text](image-3.png)
+![alt text](data/images/image-3.png)
 ##### The Random forest model also tried to predict values close to the average for almost all songs. But, it is possible to notice a certain "bulge" to the right, indicating that the model managed to extract a bit more information over the features, when compared to the Ridge model.
-![alt text](image-4.png)
+![alt text](data/images/image-4.png)
 ##### The same can be said to lgbm.
 ##### These residual plots confirm that all models collapse towards the mean (a strong bias). The usage of feature engineering or domain-specific variables is required to improve performance, specially at the extremes.
 ##### The First Submission (with the baseline) got me 1481th place out of 2,035 participants and 1,986 teams. Considering this was a minimal solution, it sets a benchmark to improve upon in the next iterations.
-![alt text](image.png)
+![alt text](data/images/image.png)
 ##### More feature engineering was done, this time using autofeat. The algorithm sugested the creation of new variables:
 1. VocalContent^3  / Energy
 2. Energy^3 / AcousticQuality
@@ -127,7 +127,25 @@ GitHub: https://github.com/Menezes-Gus
 |lgbm|26.467350811600735|26.467526741672962|21.198498087056862|21.198457247155215|
 ##### Automatic feature generation (polynomials, ratios, logs, etc.) was tested with multiple strategies, but results did not show meaningful improvements. Further progress will likely require domain-specific engineered variables or rely on optimization of hyperparameters.
 ##### I submitted the results of the best trained model (with engineered features), random forest. The submission's RMSE actually got worse.
-![alt text](image-5.png)
+![alt text](data/images/image-5.png)
+##### I decided to use a classification model to try to predict the extremes and create a feature. This way, i expected the new flags to help the regression models. While in the permutation importance dataframe, some of them showed potential, the actual result was a little bit worse then the baseline submission.
+![alt text](data/images/image-6.png)
+##### Since there were no improvements with the added classificassion feature, the last options that i see are Stacking, Deep Learning (MLP) and/or Hyperparameter optmization. First i'll try stacking, and, if there is enough time, hyperparameter optimization, and then MLP.
+##### I decided to create 3 Stacks, the baseline models (the ones that resulted in better performance in submission) where used as estimators, and the meta models were Rigde, LGBM and RandomForest. This was the results:
+1. Ridge:
+![alt text](data/images/image-7.png)
+2. RandomForest:
+![alt text](data/images/image-9.png)
+3. LGBM:
+![alt text](data/images/image-10.png)
+##### Both Ridge and LGBM achieved improvements, and catapulted me to the 844th position :)
+![alt text](data/images/image-11.png)
+##### I also made a manual stacking, using Ridge as the meta model, and, i got 0.00001 less RMSE, which made me go 1 position up. This may have happened because Kaggle only evaluates 20% of the data in order to build its leaderboard.
+![alt text](data/images/image-12.png)
+##### Tried a blend, using the baseline models + the manual stacking, and got a little improvement
+![alt text](data/images/image-13.png)
 
-### Next Steps:
-##### More feature engineering, modeling
+##### The competition is OVER
+![alt text](data/images/image-final.png)
+##### I did not got a very good position, but, i definetly learned a lot
+

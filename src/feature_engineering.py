@@ -125,7 +125,7 @@ def create_live_track_interaction(df) -> pd.DataFrame:
     df['live_track_interaction'] = np.sqrt(df['LivePerformanceLikelihood']) * df['TrackDurationMs']**2
     return df
 
-def create_classification_model(X: pd.DataFrame, y: pd.Series, kf: KFold,random_state: int = 42):
+def create_classification_model(X: pd.DataFrame, y: pd.Series, kf: KFold, random_state: int = 42):
     """
     Function to run classification model. The objective is to classify if the song is slow, medium or fast (0, 1 and 2)
     This classification (probability) will be used as a feature for the main regression
@@ -135,10 +135,11 @@ def create_classification_model(X: pd.DataFrame, y: pd.Series, kf: KFold,random_
     clf = LGBMClassifier(n_estimators=500,random_state=random_state)
     proba = cross_val_predict(clf, X, y, cv=kf, method="predict_proba", n_jobs=-1)
     proba_df = pd.DataFrame(proba, columns=["proba_slow", "proba_medium", "proba_fast"], index=X.index)
+    clf.fit(X, y)
 
     return pd.concat([X, proba_df], axis=1), clf
 
-def create_classification_model(X: pd.DataFrame, clf: LGBMClassifier,  kf: KFold,random_state: int = 42):
+def run_classification_model(X: pd.DataFrame, clf: LGBMClassifier, random_state: int = 42):
     """
     Function to run classification model. The objective is to classify if the song is slow, medium or fast (0, 1 and 2)
     This classification (probability) will be used as a feature for the main regression
