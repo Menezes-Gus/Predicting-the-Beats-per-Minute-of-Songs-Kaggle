@@ -16,15 +16,18 @@ The goal of this competition is to predict a song's beats-per-minute.
    ```bash
    git clone https://github.com/Menezes-Gus/Predicting-the-Beats-per-Minute-of-Songs-Kaggle.git
    ```
-2. If you don't already have the data zip file in data/raw folder, run download_data.py:
+2. To Install Dependencies:
+    ```bash
+   pip install requirements.txt
+   ```
+3. If you don't already have the data zip file in data/raw folder, run download_data.py:
     ```bash
    python src/download_data.py
    ```
-3. If you don't already extracted the zip file downloaded in the previous step, run extract_zip.py:
+4. If you don't already extracted the zip file downloaded in the previous step, run extract_zip.py:
     ```bash
    python src/extract_zip.py
    ```
-4. Continues...
 
 
 
